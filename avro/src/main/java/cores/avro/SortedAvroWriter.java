@@ -18,6 +18,7 @@ public class SortedAvroWriter<K, V> {
     private SortedArray<K, V> sort = new SortedArray<K, V>();
     private int x = 0;
     private long bytes;
+    //private static final int DEFAULT_MAX_COUNT = 100000;
 
     private int fileIndex = 0;
     private int max;
@@ -71,6 +72,9 @@ public class SortedAvroWriter<K, V> {
             //            bytes += value.toString().length();
             if (Runtime.getRuntime().freeMemory() <= (free * 1024 * 1024)) {
                 max = sort.size();
+                /*if (max < DEFAULT_MAX_COUNT) {
+                    max = DEFAULT_MAX_COUNT;
+                }*/
                 mul = max / mul;
                 System.out.println("####sortarray max####" + mul);
                 System.out.println("####max####" + max);

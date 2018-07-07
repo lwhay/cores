@@ -1,5 +1,0 @@
-{"type": "record", "name": "Part",
- "fields": [
-    {"name":"GeneSymbol", "type":"string"}
- ]
-}

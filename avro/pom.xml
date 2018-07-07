@@ -256,6 +256,14 @@
           <scope>provided</scope>
         </dependency>
         <dependency>
+          <groupId>org.apache.hadoop</groupId>
+          <artifactId>hadoop-hdfs</artifactId>
+          <version>${hadoop2.version}</version>
+          <!-- hadoop's execution environment provides its own jars, usurping any others.
+            So we should not include it here -->
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
           <groupId>org.apache.avro</groupId>
           <artifactId>avro-mapred</artifactId>
           <version>${avro.version}</version>

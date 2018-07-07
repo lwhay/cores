@@ -32,6 +32,7 @@ public class InsertAvroColumnWriter<K, V> {
     private long bytes;
     int x = 0;
     long start, end;
+    //private static final int DEFAULT_MAX_COUNT = 100000;
 
     private int fileIndex = 0;
 
@@ -85,6 +86,9 @@ public class InsertAvroColumnWriter<K, V> {
             bytes += value.toString().length();
             if (Runtime.getRuntime().freeMemory() <= (free * 1024 * 1024)) {
                 max = sort.size();
+                /*if (max < DEFAULT_MAX_COUNT) {
+                    max = DEFAULT_MAX_COUNT;
+                }*/
                 mul = max / mul;
                 System.out.println("####sortarray max####" + mul);
                 System.out.println("####max####" + max);

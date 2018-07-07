@@ -52,8 +52,8 @@ public class NeciFilterRecordReader extends RecordReader<AvroKey<Record>, NullWr
                 filters);
         reader.createSchema(AvroJob.getInputKeySchema(context.getConfiguration()));
         reader.filter();
-        System.out.println("Filter set ***" + reader.getCurrentSet());
-        LOG.info("Filter set ***" + reader.getCurrentSet().toString());
+        //System.out.println("Filter set ***" + reader.getCurrentSet());
+        //LOG.info("Filter set ***" + reader.getCurrentSet().toString());
         reader.createFilterRead();
         ArrayList<BitSet> set = reader.getReadSet();
         for (int i = 0; i < set.size(); i++) {

@@ -1,6 +1,0 @@
-{"type": "record", "name": "Lineitem",
- "fields": [
-     {"name": "l_extendedprice", "type": "float"},
-     {"name": "l_discount", "type": "float"}
- ]
-}
