@@ -42,12 +42,17 @@ public class InsertAvroColumnWriter<K, V> {
     private int mul;
 
     public InsertAvroColumnWriter(Schema schema, String path, int[] keyFields, int free, int mul) throws IOException {
+        this(schema, path, keyFields, free, mul, "null");
+    }
+
+    public InsertAvroColumnWriter(Schema schema, String path, int[] keyFields, int free, int mul, String codec)
+            throws IOException {
         this.schema = schema;
         AvroColumnator columnator = new AvroColumnator(schema);
         filemeta = new FileMetaData();
         filemeta.set(SCHEMA_KEY, schema.toString());
         this.meta = columnator.getColumns();
-        this.writer = new InsertColumnFileWriter(filemeta, meta);
+        this.writer = new InsertColumnFileWriter(filemeta.setCodec(codec), meta);
         this.arrayWidths = columnator.getArrayWidths();
         this.model = GenericData.get();
         this.keyFields = keyFields;

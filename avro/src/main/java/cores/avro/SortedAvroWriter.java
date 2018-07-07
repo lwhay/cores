@@ -19,6 +19,7 @@ public class SortedAvroWriter<K, V> {
     private int x = 0;
     private long bytes;
     //private static final int DEFAULT_MAX_COUNT = 100000;
+    private final String codec;
 
     private int fileIndex = 0;
     private int max;
@@ -26,6 +27,10 @@ public class SortedAvroWriter<K, V> {
     private int mul;
 
     public SortedAvroWriter(String path, Schema schema, int free, int mul) {
+        this(path, schema, free, mul, "null");
+    }
+
+    public SortedAvroWriter(String path, Schema schema, int free, int mul, String codec) {
         //    assert numFiles > 1;
         this.path = path;
         this.free = free;
@@ -35,6 +40,7 @@ public class SortedAvroWriter<K, V> {
         fileDelete(path);
         //    createFiles(path, numFiles);
         this.schema = schema;
+        this.codec = codec;
     }
 
     public String getPath() {
