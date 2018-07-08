@@ -201,17 +201,38 @@ public class BlockColumnValues<T extends Comparable> implements Iterator<T>, Ite
         this.row = column.firstRows[block];
 
         in.seek(column.blockStarts[block]);
-        int end = column.blocks[block].compressedSize;
+        int end = column.blocks[block].getCompressedSize();
         byte[] raw = new byte[end + checksum.size()];
         in.readFully(raw);
-        ByteBuffer data = codec.decompress(ByteBuffer.wrap(raw, 0, end));
+        /*ByteBuffer data = codec.decompress(ByteBuffer.wrap(raw, 0, end));
         if (!checksum.compute(data).equals(ByteBuffer.wrap(raw, end, checksum.size())))
-            throw new IOException("Checksums mismatch.");
-        if (isUnion)
+            throw new IOException("Checksums mismatch.");*/
+        if (isUnion) {
+            ByteBuffer data = codec.decompress(ByteBuffer.wrap(raw, 0, column.blocks[block].lengthUnion));
             values = new UnionInputBuffer(data, column.blocks[block].rowCount, unionBits, unionArray);
-        else
-            values = new BlockInputBuffer(data, column.blocks[block].rowCount);
-        long e = System.nanoTime();
+        } else {
+            if (column.blocks[block].lengthOffset != 0) {
+                ByteBuffer data = ByteBuffer.allocate(column.blocks[block].getUncompressedSize());
+                ByteBuffer buf1 = codec.decompress(
+                        ByteBuffer.wrap(raw, column.blocks[block].lengthUnion, column.blocks[block].lengthOffset));
+                //buf1.flip();
+                //data.flip();
+                System.arraycopy(buf1.array(), 0, data.array(), 0, buf1.limit());
+                ByteBuffer buf2 = codec.decompress(
+                        ByteBuffer.wrap(raw, column.blocks[block].lengthUnion + column.blocks[block].lengthOffset,
+                                column.blocks[block].lengthPayload));
+                //buf2.flip();
+                System.arraycopy(buf2.array(), buf2.position(), data.array(), buf1.limit(), buf2.remaining());
+                values = new BlockInputBuffer(data, column.blocks[block].rowCount);
+            } else {
+                byte[] buf2 = codec.decompress(
+                        ByteBuffer.wrap(raw, column.blocks[block].lengthUnion + column.blocks[block].lengthOffset,
+                                column.blocks[block].lengthPayload))
+                        .array();
+                values = new BlockInputBuffer(ByteBuffer.wrap(buf2), column.blocks[block].rowCount);
+            }
+        }
+        //long e = System.nanoTime();
         //        blockTime.add((e - s));
         //        blockStart.add(s);
         //        blockEnd.add(e);

@@ -26,7 +26,7 @@ public class ColumnDescriptor<T extends Comparable> {
 
     long start;
 
-    BlockDescriptor[] blocks;
+    CompressedBlockDescriptor[] blocks;
 
     long[] blockStarts; // for random access
     int[] firstRows; // for binary searches
@@ -37,7 +37,7 @@ public class ColumnDescriptor<T extends Comparable> {
         this.metaData = metaData;
     }
 
-    public void setBlockDescriptor(BlockDescriptor[] blocks) {
+    public void setBlockDescriptor(CompressedBlockDescriptor[] blocks) {
         this.blocks = blocks;
     }
 
@@ -97,10 +97,15 @@ public class ColumnDescriptor<T extends Comparable> {
         long startPosition = start;
         int row = 0;
         for (int i = 0; i < blockCount; i++) {
-            BlockDescriptor b = blocks[i];
+            /*BlockDescriptor b = blocks[i];
             blockStarts[i] = startPosition;
             firstRows[i] = row;
             startPosition += b.compressedSize + checksum.size();
+            row += b.rowCount;*/
+            CompressedBlockDescriptor b = blocks[i];
+            blockStarts[i] = startPosition;
+            firstRows[i] = row;
+            startPosition += b.getCompressedSize() + checksum.size();
             row += b.rowCount;
         }
     }

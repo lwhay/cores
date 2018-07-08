@@ -117,9 +117,9 @@ public class InsertColumnFileReader implements Closeable {
             FileColumnMetaData meta = FileColumnMetaData.read(in, this);
             meta.setDefaults(this.metaData);
             int blockCount = in.readFixed32();
-            BlockDescriptor[] blocks = new BlockDescriptor[blockCount];
+            CompressedBlockDescriptor[] blocks = new CompressedBlockDescriptor[blockCount];
             for (int j = 0; j < blockCount; j++) {
-                blocks[j] = BlockDescriptor.read(in);
+                blocks[j] = CompressedBlockDescriptor.read(in);
                 //          if (meta.hasIndexValues())
                 //          firstValues[i] = in.<T>readValue(meta.getType());
             }

@@ -36,6 +36,16 @@ public class BlockInputBuffer {
         //        offset = count * 2;
     }
 
+    /*public ByteBuffer getAsByteBuffer() {
+        return ByteBuffer.wrap(buf, 0, count);
+    }
+    
+    public void decompressUsing(Codec cc) throws IOException {
+        ByteBuffer result = cc.decompress(getAsByteBuffer());
+        buf = result.array();
+        count = result.remaining();
+    }*/
+
     public <T extends Comparable> T readValue(ValueType type) throws IOException {
         switch (type) {
             case NULL:

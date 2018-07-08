@@ -2,7 +2,10 @@ package cores.core;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
 import java.util.Arrays;
+
+import org.apache.trevni.TrevniRuntimeException;
 
 public class UnionOutputBuffer extends BlockOutputBuffer {
     private byte[] buf3;
@@ -11,6 +14,26 @@ public class UnionOutputBuffer extends BlockOutputBuffer {
     private int count3;
     private int bitCount3;
     private int unionBits;
+
+    ByteBuffer getAsByteBuffer3() {
+        return ByteBuffer.wrap(buf3, 0, count3);
+    }
+
+    public int unionSize() {
+        return count3;
+    }
+
+    public void compressUsing(Codec cc) throws IOException {
+        super.compressUsing(cc);
+        ByteBuffer result;
+        if (count3 != 0) {
+            result = cc.compress(getAsByteBuffer3());
+            buf3 = result.array();
+            count3 = result.remaining();
+        } else {
+            throw new TrevniRuntimeException("compress zero page: " + count1 + ":" + count2 + ":" + count3);
+        }
+    }
 
     public UnionOutputBuffer(ValueType[] types, int unionBits) {
         super();

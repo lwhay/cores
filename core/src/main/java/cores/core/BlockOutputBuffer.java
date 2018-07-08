@@ -29,6 +29,18 @@ public class BlockOutputBuffer {
         return (count1 + count2) >= BLOCK_SIZE;
     }
 
+    public int unionSize() {
+        return 0;
+    }
+
+    public int offsetSize() {
+        return count1;
+    }
+
+    public int payloadSize() {
+        return count2;
+    }
+
     public int size() {
         return count1 + count2;
     }
@@ -39,6 +51,37 @@ public class BlockOutputBuffer {
         count1 = 0;
         count2 = 0;
         bitCount = 0;
+    }
+
+    public synchronized void reset() {
+        buf1 = new byte[BLOCK_SIZE];
+        buf2 = new byte[BLOCK_SIZE];
+        count1 = 0;
+        count2 = 0;
+        bitCount = 0;
+    }
+
+    ByteBuffer getAsByteBuffer1() {
+        return ByteBuffer.wrap(buf1, 0, count1);
+    }
+
+    ByteBuffer getAsByteBuffer2() {
+        return ByteBuffer.wrap(buf2, 0, count2);
+    }
+
+    public void compressUsing(Codec cc) throws IOException {
+        if (count1 != 0) {
+            ByteBuffer result = cc.compress(getAsByteBuffer1());
+            buf1 = result.array();
+            count1 = result.remaining();
+        }
+        if (count2 != 0) {
+            ByteBuffer result = cc.compress(getAsByteBuffer2());
+            buf2 = result.array();
+            count2 = result.remaining();
+        } else {
+            throw new TrevniRuntimeException("compress zero page: " + count1 + ":" + count2);
+        }
     }
 
     public void writeValue(Object value, ValueType type) throws IOException {
@@ -181,12 +224,6 @@ public class BlockOutputBuffer {
     public synchronized void writeTo(OutputStream out) throws IOException {
         out.write(buf1, 0, count1);
         out.write(buf2, 0, count2);
-    }
-
-    public synchronized void reset() {
-        count1 = 0;
-        count2 = 0;
-        bitCount = 0;
     }
 
     public synchronized void write(byte b[], int off, int len) {

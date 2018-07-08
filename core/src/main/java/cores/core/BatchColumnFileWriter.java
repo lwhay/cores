@@ -11,6 +11,7 @@ import cores.core.InsertColumnFileWriter.Blocks;
 import cores.core.InsertColumnFileWriter.ListArr;
 
 public class BatchColumnFileWriter {
+    private Codec codec;
     private FileColumnMetaData[] meta;
     private FileMetaData filemeta;
     private File[] files;
@@ -49,6 +50,17 @@ public class BatchColumnFileWriter {
         for (int i = 0; i < columncount; i++) {
             blocks[i] = new Blocks();
         }
+        if (filemeta.getCodec() != null) {
+            this.codec = Codec.get(filemeta);
+        }
+    }
+
+    private CompressedBlockDescriptor applyCodingWithBlockDesc(int row, BlockOutputBuffer buf) throws IOException {
+        int unCompressSize = buf.size();
+        if (codec != null) {
+            buf.compressUsing(codec);
+        }
+        return new CompressedBlockDescriptor(row, unCompressSize, buf.unionSize(), buf.offsetSize(), buf.payloadSize());
     }
 
     public void setMergeFiles(File[] files) throws IOException {
@@ -154,7 +166,7 @@ public class BatchColumnFileWriter {
             for (int i = 0; i < readers.length; i++) {
                 while (values[i].hasNext()) {
                     if (ubuf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, ubuf.size(), ubuf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, ubuf);
                         blocks[column].add(b);
                         row = 0;
                         ubuf.writeTo(out);
@@ -171,7 +183,7 @@ public class BatchColumnFileWriter {
                 }
             }
             if (ubuf.size() != 0) {
-                BlockDescriptor b = new BlockDescriptor(row, ubuf.size(), ubuf.size());
+                CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, ubuf);
                 blocks[column].add(b);
                 ubuf.writeTo(out);
                 ubuf.reset();
@@ -179,11 +191,10 @@ public class BatchColumnFileWriter {
             ubuf.close();
         } else {
             BlockOutputBuffer buf = new BlockOutputBuffer();
-
             for (int i = 0; i < readers.length; i++) {
                 while (values[i].hasNext()) {
                     if (buf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                         blocks[column].add(b);
                         row = 0;
                         buf.writeTo(out);
@@ -196,7 +207,7 @@ public class BatchColumnFileWriter {
             }
 
             if (buf.size() != 0) {
-                BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                 blocks[column].add(b);
                 buf.writeTo(out);
             }
@@ -214,7 +225,7 @@ public class BatchColumnFileWriter {
             int length = 0;
             while (values[i].hasNext()) {
                 if (buf.isFull()) {
-                    BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                    CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                     blocks[column].add(b);
                     row = 0;
                     buf.writeTo(out);
@@ -229,7 +240,7 @@ public class BatchColumnFileWriter {
         }
 
         if (buf.size() != 0) {
-            BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+            CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
             blocks[column].add(b);
             buf.writeTo(out);
         }
@@ -244,7 +255,7 @@ public class BatchColumnFileWriter {
             if (meta[i].isArray()) {
                 for (Object x : insert[i].toArray()) {
                     if (buf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                         blocks[i].add(b);
                         row = 0;
                         buf.writeTo(out);
@@ -257,7 +268,7 @@ public class BatchColumnFileWriter {
                 UnionOutputBuffer ubuf = new UnionOutputBuffer(meta[i].getUnionArray(), meta[i].getUnionBits());
                 for (Object x : insert[i].toArray()) {
                     if (ubuf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, ubuf.size(), ubuf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, ubuf);
                         blocks[i].add(b);
                         row = 0;
                         ubuf.writeTo(out);
@@ -271,7 +282,7 @@ public class BatchColumnFileWriter {
                     row++;
                 }
                 if (ubuf.size() != 0) {
-                    BlockDescriptor b = new BlockDescriptor(row, ubuf.size(), ubuf.size());
+                    CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, ubuf);
                     blocks[i].add(b);
                     ubuf.writeTo(out);
                     ubuf.reset();
@@ -280,7 +291,7 @@ public class BatchColumnFileWriter {
             } else {
                 for (Object x : insert[i].toArray()) {
                     if (buf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                         blocks[i].add(b);
                         row = 0;
                         buf.writeTo(out);
@@ -294,7 +305,7 @@ public class BatchColumnFileWriter {
             insert[i].clear();
 
             if (buf.size() != 0) {
-                BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                 blocks[i].add(b);
                 buf.writeTo(out);
                 buf.reset();
@@ -316,7 +327,7 @@ public class BatchColumnFileWriter {
                 int tmp = 0;
                 for (Object x : insert[i].toArray()) {
                     if (buf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                         blocks[i].add(b);
                         row = 0;
                         buf.writeTo(out);
@@ -330,7 +341,7 @@ public class BatchColumnFileWriter {
                 UnionOutputBuffer ubuf = new UnionOutputBuffer(meta[i].getUnionArray(), meta[i].getUnionBits());
                 for (Object x : insert[i].toArray()) {
                     if (ubuf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, ubuf.size(), ubuf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, ubuf);
                         blocks[i].add(b);
                         row = 0;
                         ubuf.writeTo(out);
@@ -344,7 +355,7 @@ public class BatchColumnFileWriter {
                     row++;
                 }
                 if (ubuf.size() != 0) {
-                    BlockDescriptor b = new BlockDescriptor(row, ubuf.size(), ubuf.size());
+                    CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, ubuf);
                     blocks[i].add(b);
                     ubuf.writeTo(out);
                     ubuf.reset();
@@ -353,7 +364,7 @@ public class BatchColumnFileWriter {
             } else {
                 for (Object x : insert[i].toArray()) {
                     if (buf.isFull()) {
-                        BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                        CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                         blocks[i].add(b);
                         row = 0;
                         buf.writeTo(out);
@@ -367,7 +378,7 @@ public class BatchColumnFileWriter {
             insert[i].clear();
 
             if (buf.size() != 0) {
-                BlockDescriptor b = new BlockDescriptor(row, buf.size(), buf.size());
+                CompressedBlockDescriptor b = applyCodingWithBlockDesc(row, buf);
                 blocks[i].add(b);
                 buf.writeTo(out);
                 buf.reset();
@@ -392,7 +403,7 @@ public class BatchColumnFileWriter {
             header.writeFixed32(size);
             for (int k = 0; k < size; k++) {
                 blocks[i].get(k).writeTo(header);
-                delay += blocks[i].get(k).compressedSize;
+                delay += ((CompressedBlockDescriptor) (blocks[i].get(k))).getCompressedSize();
             }
             blocks[i].clear();
             i++;
