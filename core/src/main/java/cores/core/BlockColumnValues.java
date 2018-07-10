@@ -187,7 +187,7 @@ public class BlockColumnValues<T extends Comparable> implements Iterator<T>, Ite
     }
 
     public void startBlock(int block) throws IOException {
-        long s = System.nanoTime();
+        //long s = System.nanoTime();
         //        readBlockSize++;
         //        seekedBlock += Math.abs(block - this.block - 1);
         //                if (skipLength != null) {
@@ -202,6 +202,7 @@ public class BlockColumnValues<T extends Comparable> implements Iterator<T>, Ite
 
         in.seek(column.blockStarts[block]);
         int end = column.blocks[block].getCompressedSize();
+        //System.out.println(column.metaData.getName() + "\t:" + block + "\t" + column.blockStarts[block] + "\t" + end);
         byte[] raw = new byte[end + checksum.size()];
         in.readFully(raw);
         /*ByteBuffer data = codec.decompress(ByteBuffer.wrap(raw, 0, end));
@@ -215,13 +216,10 @@ public class BlockColumnValues<T extends Comparable> implements Iterator<T>, Ite
                 ByteBuffer data = ByteBuffer.allocate(column.blocks[block].getUncompressedSize());
                 ByteBuffer buf1 = codec.decompress(
                         ByteBuffer.wrap(raw, column.blocks[block].lengthUnion, column.blocks[block].lengthOffset));
-                //buf1.flip();
-                //data.flip();
                 System.arraycopy(buf1.array(), 0, data.array(), 0, buf1.limit());
                 ByteBuffer buf2 = codec.decompress(
                         ByteBuffer.wrap(raw, column.blocks[block].lengthUnion + column.blocks[block].lengthOffset,
                                 column.blocks[block].lengthPayload));
-                //buf2.flip();
                 System.arraycopy(buf2.array(), buf2.position(), data.array(), buf1.limit(), buf2.remaining());
                 values = new BlockInputBuffer(data, column.blocks[block].rowCount);
             } else {

@@ -42,7 +42,7 @@ public class Q19 {
         FilterBatchColumnReader<Record> reader = new FilterBatchColumnReader<Record>(file, filters);
         reader.createSchema(readSchema);
         long t1 = System.currentTimeMillis();
-        reader.filterNoCasc();
+        reader.filter();
         long t2 = System.currentTimeMillis();
         reader.createFilterRead(max);
         int count = 0;
