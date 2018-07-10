@@ -69,17 +69,24 @@ public class BlockOutputBuffer {
         return ByteBuffer.wrap(buf2, 0, count2);
     }
 
+    // Comments for verification purpose.
     public void compressUsing(Codec cc) throws IOException {
         if (count1 != 0) {
             ByteBuffer result = cc.compress(getAsByteBuffer1());
+            //int old = count1;
             buf1 = result.array();
             count1 = result.remaining();
+            /*ByteBuffer bb = cc.decompress(ByteBuffer.wrap(buf1, 0, count1));
+            System.out.println("1\t" + old + ":" + count1 + ":" + bb.remaining());*/
         }
         if (count2 != 0) {
             ByteBuffer result = cc.compress(getAsByteBuffer2());
+            //int old = count2;
             buf2 = result.array();
             count2 = result.remaining();
-        } else {
+            /*ByteBuffer bb = cc.decompress(ByteBuffer.wrap(buf2, 0, count2));
+            System.out.println("2\t" + old + ":" + count2 + ":" + bb.remaining());*/
+        } else if (!this.getClass().getName().equals("cores.core.UnionOutputBuffer")) {
             throw new TrevniRuntimeException("compress zero page: " + count1 + ":" + count2);
         }
     }

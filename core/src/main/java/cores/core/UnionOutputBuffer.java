@@ -28,8 +28,11 @@ public class UnionOutputBuffer extends BlockOutputBuffer {
         ByteBuffer result;
         if (count3 != 0) {
             result = cc.compress(getAsByteBuffer3());
+            //int old = count3;
             buf3 = result.array();
             count3 = result.remaining();
+            /*ByteBuffer bb = cc.decompress(result);
+            System.out.println("\t" + old + ":" + count3 + ":" + bb.remaining());*/
         } else {
             throw new TrevniRuntimeException("compress zero page: " + count1 + ":" + count2 + ":" + count3);
         }
@@ -103,15 +106,16 @@ public class UnionOutputBuffer extends BlockOutputBuffer {
     }
 
     public synchronized void writeTo(OutputStream out) throws IOException {
+        //System.out.println(count3 + ":" + count1 + ":" + count2);
         out.write(buf3, 0, count3);
         out.write(buf1, 0, count1);
         out.write(buf2, 0, count2);
     }
 
     public synchronized void reset() {
+        super.reset();
+        buf3 = new byte[COUNT];
         count3 = 0;
-        count1 = 0;
-        count2 = 0;
         bitCount3 = 0;
     }
 }
