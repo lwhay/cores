@@ -15,10 +15,10 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.trevni.TrevniRuntimeException;
 
-import cores.core.ColumnValues;
-import cores.core.FileColumnMetaData;
-import cores.core.InsertColumnFileReader;
-import cores.core.ValueType;
+import columnar.ColumnValues;
+import columnar.InsertColumnFileReader;
+import metadata.FileColumnMetaData;
+import misc.ValueType;
 
 public class ColumnReader<D> implements Closeable {
     InsertColumnFileReader reader;

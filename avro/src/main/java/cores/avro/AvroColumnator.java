@@ -27,8 +27,8 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.Schema.Type;
 import org.apache.trevni.TrevniRuntimeException;
 
-import cores.core.FileColumnMetaData;
-import cores.core.ValueType;
+import metadata.FileColumnMetaData;
+import misc.ValueType;
 
 /** Utility that computes the column layout of a schema. */
 class AvroColumnator {

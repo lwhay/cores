@@ -15,10 +15,10 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.trevni.TrevniRuntimeException;
 
-import cores.core.BatchColumnFileReader;
-import cores.core.BlockColumnValues;
-import cores.core.FileColumnMetaData;
-import cores.core.ValueType;
+import columnar.BatchColumnFileReader;
+import columnar.BlockColumnValues;
+import metadata.FileColumnMetaData;
+import misc.ValueType;
 
 public class BatchColumnReader<D> implements Closeable {
     BatchColumnFileReader reader;

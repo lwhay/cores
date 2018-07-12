@@ -15,10 +15,10 @@ import org.apache.avro.generic.GenericFixed;
 import org.apache.avro.util.Utf8;
 import org.apache.trevni.TrevniRuntimeException;
 
-import cores.core.BatchColumnFileWriter;
-import cores.core.FileColumnMetaData;
-import cores.core.FileMetaData;
-import cores.core.InsertColumnFileWriter.ListArr;
+import columnar.BatchColumnFileWriter;
+import columnar.InsertColumnFileWriter.ListArr;
+import metadata.FileColumnMetaData;
+import metadata.FileMetaData;
 
 public class BatchAvroColumnWriter<T> {
     private Schema schema;

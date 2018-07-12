@@ -9,11 +9,11 @@ import java.util.List;
 
 import org.apache.avro.Schema;
 
-import cores.core.BlockDescriptor;
-import cores.core.FileColumnMetaData;
-import cores.core.FileMetaData;
-import cores.core.InsertColumnFileWriter;
-import cores.core.OutputBuffer;
+import columnar.BlockDescriptor;
+import columnar.InsertColumnFileWriter;
+import io.OutputBuffer;
+import metadata.FileColumnMetaData;
+import metadata.FileMetaData;
 
 public class AvroColumnWriter {
     protected FileColumnMetaData[] meta;

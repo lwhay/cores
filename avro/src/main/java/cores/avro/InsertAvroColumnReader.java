@@ -16,9 +16,9 @@ import org.apache.avro.Schema.Field;
 import org.apache.avro.generic.GenericData;
 import org.apache.trevni.TrevniRuntimeException;
 
-import cores.core.ColumnValues;
-import cores.core.FileColumnMetaData;
-import cores.core.InsertColumnFileReader;
+import columnar.ColumnValues;
+import columnar.InsertColumnFileReader;
+import metadata.FileColumnMetaData;
 
 public class InsertAvroColumnReader<D> implements Iterator<D>, Iterable<D>, Closeable {
     private InsertColumnFileReader reader;
@@ -63,7 +63,7 @@ public class InsertAvroColumnReader<D> implements Iterator<D>, Iterable<D>, Clos
     }
 
     void initialize() throws IOException {
-        //建立文件的列名称和列号之间的map
+        //寤虹珛鏂囦欢鐨勫垪鍚嶇О鍜屽垪鍙蜂箣闂寸殑map
         Map<String, Integer> fileColumnNumbers = new HashMap<String, Integer>();
         int i = 0;
         for (FileColumnMetaData c : new AvroColumnator(fileSchema).getColumns()) {
@@ -87,7 +87,7 @@ public class InsertAvroColumnReader<D> implements Iterator<D>, Iterable<D>, Clos
         //findDefaults(readSchema, fileSchema, true);
     }
 
-    //对每个在读schema中而不在写schema中的fields设置default值，并检查匹配性
+    //瀵规瘡涓湪璇籹chema涓�屼笉鍦ㄥ啓schema涓殑fields璁剧疆default鍊硷紝骞舵鏌ュ尮閰嶆��
     //  private void findDefaults(Schema read, Schema write, boolean m){
     //    switch(read.getType()){
     //      case NULL: case BOOLEAN:
@@ -182,7 +182,7 @@ public class InsertAvroColumnReader<D> implements Iterator<D>, Iterable<D>, Clos
             case MAP:
                 values[column].startRow();
                 int size = values[column].nextLength();
-                Map map = (Map) new HashMap(size);
+                Map<String, Object> map = new HashMap<>(size);
                 for (int i = 0; i < size; i++) {
                     this.column = startColumn;
                     values[column].startRow();
