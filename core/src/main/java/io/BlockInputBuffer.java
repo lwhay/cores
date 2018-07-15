@@ -193,7 +193,11 @@ public class BlockInputBuffer {
 
     public byte[] readUnionFixed(int len) throws IOException {
         byte[] res = new byte[len];
-        System.arraycopy(buf, offset + count, res, 0, len);
+        try {
+            System.arraycopy(buf, offset + count, res, 0, len);
+        } catch (Exception e) {
+            throw new TrevniRuntimeException(buf.length + ":" + offset + ":" + count + ":" + res.length + ":" + len);
+        }
         offset = readFixed16();
         return res;
     }

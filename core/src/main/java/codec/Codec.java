@@ -36,7 +36,8 @@ public abstract class Codec {
         else if ("snappy".equals(name))
             return new SnappyCodec();
         else if ("bzip2".equals(name))
-            return new BZip2Codec();
+            throw new TrevniRuntimeException("Bzip2 not supported: " + name);
+        //return new BZip2Codec();
         else
             throw new TrevniRuntimeException("Unknown codec: " + name);
     }

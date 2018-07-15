@@ -220,7 +220,12 @@ public class BlockColumnValues<T extends Comparable> implements Iterator<T>, Ite
                 values = new UnionInputBuffer(ByteBuffer.wrap(raw, 0, end), column.blocks[block].rowCount, unionBits,
                         unionArray);
             } else {
-                ByteBuffer data = ByteBuffer.allocate(column.blocks[block].getUncompressedSize());
+                ByteBuffer data = null;
+                if (column.blocks[block].getUncompressedSize() >= column.blocks[block].getCompressedSize()) {
+                    data = ByteBuffer.allocate(column.blocks[block].getUncompressedSize());
+                } else {
+                    data = ByteBuffer.allocate(column.blocks[block].getCompressedSize());
+                }
                 /*System.out.println("\t" + column.blocks[block].lengthUnion + ":" + column.blocks[block].lengthOffset + ":"
                     + column.blocks[block].lengthPayload + ":" + column.blocks[block].getCompressedSize() + ":"
                     + column.blocks[block].getUncompressedSize());*/

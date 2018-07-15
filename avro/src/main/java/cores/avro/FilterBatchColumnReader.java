@@ -715,7 +715,14 @@ public class FilterBatchColumnReader<D> implements Closeable {
             } else {
                 int j = 0;
                 while (j < currentMax) {
-                    readValue[i][j++] = values[readNO[i]].next();
+                    try {
+                        readValue[i][j++] = values[readNO[i]].next();
+                    } catch (Exception e) {
+                        throw new TrevniRuntimeException(
+                                "array overleave" + i + ":" + readValue.length + ":" + j + ":"
+                                        + readValue[i].length + ":" + readNO[i] + ":" + values.length + ":"
+                                        + readNO.length);
+                    }
                 }
             }
         }
