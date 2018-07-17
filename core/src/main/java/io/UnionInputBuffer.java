@@ -118,6 +118,9 @@ public class UnionInputBuffer extends BlockInputBuffer {
     }
 
     public long readFixed64() throws IOException {
-        return (readFixed32() & 0xFFFFFFFFL) | (((long) readFixed32()) << 32);
+        byte[] res = buf.readUnionFixed(8);
+        long low = (res[0] & 0xff) | ((res[1] & 0xff) << 8) | ((res[2] & 0xff) << 16) | ((res[3] & 0xff) << 24);
+        long high = (res[4] & 0xff) | ((res[5] & 0xff) << 8) | ((res[6] & 0xff) << 16) | ((res[7] & 0xff) << 24);
+        return (low & 0xFFFFFFFFL) | (high << 32);
     }
 }
